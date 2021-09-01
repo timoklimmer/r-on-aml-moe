@@ -1,0 +1,35 @@
+$schema: https://azuremlschemas.azureedge.net/latest/managedOnlineEndpoint.schema.json
+
+name: r-on-aml-moe
+type: online
+auth_mode: key
+
+traffic:
+  default: 100
+
+deployments:
+  - name: default
+    model:
+      name: r-on-aml-moe
+      version: 1
+      local_path: ./scripts
+    environment:
+      name: r-on-aml-moe
+      docker:
+        image: azuremlspikeef928dea.azurecr.io/r-on-aml-moe:latest
+      inference_config:
+        liveness_route:
+          port: 8000
+          path: /live
+        readiness_route:
+          port: 8000
+          path: /ready
+        scoring_route:
+          port: 8000
+          path: /score
+    instance_type: Standard_F2s_v2
+    scale_settings:
+      scale_type: Manual
+      instance_count: 1
+      min_instances: 1
+      max_instances: 2

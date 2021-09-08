@@ -12,7 +12,7 @@ deployments:
     model:
       name: r-on-aml-moe
       version: 1
-      local_path: ./scripts
+      local_path: ./models
     environment:
       name: r-on-aml-moe
       docker:

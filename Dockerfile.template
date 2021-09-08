@@ -1,0 +1,8 @@
+FROM rstudio/plumber
+
+# CMD [<add path to plumber.R in docker image here, needs to be set dynamically due to dynamic model versions, example: "/var/azureml-app/azureml-models/r-on-aml-moe/1/models/plumber.R">]
+
+# note: we need to set the path to the plumber.R file here dynamically as it depends on the model version used in AML.
+#       the walkthrough.ps1 script shows how this dynamic adjustment can be made
+# example value: "/var/azureml-app/azureml-models/r-on-aml-moe/1/models/plumber.R"
+CMD [#PATH_TO_PLUMBER_R#]

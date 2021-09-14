@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 $RESOURCE_GROUP = "AzureMLSpikesAndDemos"
 $WORKSPACE = "AzureMLSpikesAndDemos"
 $APP_NAME = "r-on-aml-moe"
-$UNIQUE_ENDPOINT_NAME = "$APP_NAME-fglp9dk4"  # ensure that the postfix is unique
+$UNIQUE_ENDPOINT_NAME = "$APP_NAME-tr3p5dk9"  # ensure that the postfix is unique
 $CONTAINER_MODEL_NAME = "r-on-aml-moe"
 $LOCAL_CONTAINER_MODEL_PATH = "$PWD/models"
 

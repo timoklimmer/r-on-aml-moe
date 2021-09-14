@@ -1,6 +1,11 @@
 $ErrorActionPreference = "Stop"
 
 # -- configuration
+# note: - if your company requires a proxy to reach out to the internet, you need to set the following variables, too.
+#       - in that case, you also need to configure Docker to use the proxy.
+#$env:HTTP_PROXY = "..."
+#$env:HTTPS_PROXY = "..."
+
 $RESOURCE_GROUP = "AzureMLSpikesAndDemos"
 $WORKSPACE = "AzureMLSpikesAndDemos"
 $APP_NAME = "r-on-aml-moe"
@@ -38,6 +43,7 @@ Remove-Item Dockerfile.temp
 docker run -d -p 8000:8000 -v ($LOCAL_CONTAINER_MODEL_PATH + ":$azureml_model_dir") -e AZUREML_MODEL_DIR=$azureml_model_dir --name=$APP_NAME $image_tag
 
 # -- test endpoints locally
+# note: add --noproxy localhost to the following curl commands if you have configured proxies
 curl "http://localhost:8000/live"
 curl "http://localhost:8000/ready"
 curl -H "Content-Type: application/json" --data "@sample_request.json" http://localhost:8000/score

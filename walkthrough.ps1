@@ -1,3 +1,11 @@
+# Walks through deploying an R model to a Managed Online Endpoint in Azure ML.
+# ----------------------------------------------------------------------------
+# Requirements:
+# - an Azure ML workspace
+# - Azure CLI incl. ml extension installed (v2). Important: this script will NOT work with the azure-cli-ml extension,
+#   which is v1.
+# - a local Docker instance (for dev/test before deploying to Azure)
+
 $ErrorActionPreference = "Stop"
 
 # -- configuration
@@ -9,7 +17,7 @@ $ErrorActionPreference = "Stop"
 $RESOURCE_GROUP = "AzureMLSpikesAndDemos"
 $WORKSPACE = "AzureMLSpikesAndDemos"
 $APP_NAME = "r-on-aml-moe"
-$UNIQUE_ENDPOINT_NAME = "$APP_NAME-tr3p5dk9"  # ensure that the postfix is unique
+$UNIQUE_ENDPOINT_NAME = "$APP_NAME-tr3p5dm6"  # ensure that the postfix is unique
 $CONTAINER_MODEL_NAME = "r-on-aml-moe"
 $LOCAL_CONTAINER_MODEL_PATH = "$PWD/models"
 

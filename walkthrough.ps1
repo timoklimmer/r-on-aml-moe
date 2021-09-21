@@ -16,11 +16,8 @@ $ErrorActionPreference = "Stop"
 #$env:HTTP_PROXY = "..."
 #$env:HTTPS_PROXY = "..."
 
-#$RESOURCE_GROUP = "AzureMLSpikesAndDemos"
-#$WORKSPACE = "AzureMLSpikesAndDemos"
-
-$RESOURCE_GROUP = "AzureML-Central-India"
-$WORKSPACE = "AzureML-Central-India"
+$RESOURCE_GROUP = "AzureMLSpikesAndDemos"
+$WORKSPACE = "AzureMLSpikesAndDemos"
 
 $APP_NAME = "r-on-aml-moe"
 $UNIQUE_ENDPOINT_NAME = "$APP_NAME-ge7p4dmt"  # ensure that the postfix is unique

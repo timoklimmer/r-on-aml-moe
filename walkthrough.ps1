@@ -2,8 +2,10 @@
 # ----------------------------------------------------------------------------
 # Requirements:
 # - an Azure ML workspace
-# - Azure CLI incl. ml extension installed (v2). Important: this script will NOT work with the azure-cli-ml extension,
-#   which is v1.
+# - Azure CLI incl. ml extension installed (v2).
+#   IMPORTANT: This script will NOT work with the azure-cli-ml extension, which is v1.
+#              Run "az version" to find out which version you have installed. use
+#              "az extension remove/add --name <name>" to remove or add extensions as needed.
 # - a local Docker instance (for dev/test before deploying to Azure)
 
 $ErrorActionPreference = "Stop"
@@ -14,10 +16,14 @@ $ErrorActionPreference = "Stop"
 #$env:HTTP_PROXY = "..."
 #$env:HTTPS_PROXY = "..."
 
-$RESOURCE_GROUP = "AzureMLSpikesAndDemos"
-$WORKSPACE = "AzureMLSpikesAndDemos"
+#$RESOURCE_GROUP = "AzureMLSpikesAndDemos"
+#$WORKSPACE = "AzureMLSpikesAndDemos"
+
+$RESOURCE_GROUP = "AzureML-Central-India"
+$WORKSPACE = "AzureML-Central-India"
+
 $APP_NAME = "r-on-aml-moe"
-$UNIQUE_ENDPOINT_NAME = "$APP_NAME-tr3p5dm6"  # ensure that the postfix is unique
+$UNIQUE_ENDPOINT_NAME = "$APP_NAME-ge7p4dmt"  # ensure that the postfix is unique
 $CONTAINER_MODEL_NAME = "r-on-aml-moe"
 $LOCAL_CONTAINER_MODEL_PATH = "$PWD/models"
 
@@ -48,7 +54,8 @@ Remove-Item Dockerfile.temp
 #       to see the log run "docker logs --tail 1000 <container id>" or simply use "View Logs" in VS.Code ;-)
 
 & {docker rm -f -v $APP_NAME} -ErrorAction SilentlyContinue
-docker run -d -p 8000:8000 -v ($LOCAL_CONTAINER_MODEL_PATH + ":$azureml_model_dir") -e AZUREML_MODEL_DIR=$azureml_model_dir --name=$APP_NAME $image_tag
+docker run -d -p 8000:8000 -v ($LOCAL_CONTAINER_MODEL_PATH + ":$azureml_model_dir") `
+    -e AZUREML_MODEL_DIR=$azureml_model_dir --name=$APP_NAME $image_tag
 
 # -- test endpoints locally
 # note: add --noproxy localhost to the following curl commands if you have configured proxies
@@ -60,7 +67,8 @@ curl -H "Content-Type: application/json" --data "@sample_request.json" http://lo
 ## DEPLOY TO AZURE
 
 # -- deploy model(s)
-az ml model create --name $CONTAINER_MODEL_NAME --version $next_model_version --local-path $LOCAL_CONTAINER_MODEL_PATH -g $RESOURCE_GROUP -w $WORKSPACE
+az ml model create --name $CONTAINER_MODEL_NAME --version $next_model_version --local-path $LOCAL_CONTAINER_MODEL_PATH `
+    -g $RESOURCE_GROUP -w $WORKSPACE
 
 # -- publish image to ACR
 az acr login --name $acr_name
@@ -68,12 +76,19 @@ docker push $image_tag
 
 # -- deploy endpoint to AML managed online endpoint
 $endpoint_exists = [System.Convert]::ToBoolean(
-    $(az ml endpoint show -n $UNIQUE_ENDPOINT_NAME --query name -o tsv -g $RESOURCE_GROUP -w $WORKSPACE) -eq $UNIQUE_ENDPOINT_NAME
+    $(az ml endpoint show -n $UNIQUE_ENDPOINT_NAME --query name -o tsv -g $RESOURCE_GROUP -w $WORKSPACE) `
+        -eq $UNIQUE_ENDPOINT_NAME
 )
 if ($endpoint_exists -eq $false) {
-    az ml endpoint create -f endpoint.yml -n $UNIQUE_ENDPOINT_NAME --set deployments[0].model.version=$next_model_version -g $RESOURCE_GROUP -w $WORKSPACE
+    az ml endpoint create -f endpoint.yml -n $UNIQUE_ENDPOINT_NAME `
+        --set deployments[0].model.version=$next_model_version `
+        --set deployments[0].environment.docker.image=$image_tag `
+        -g $RESOURCE_GROUP -w $WORKSPACE
 } else {
-    az ml endpoint update -f endpoint.yml -n $UNIQUE_ENDPOINT_NAME --set deployments[0].model.version=$next_model_version -g $RESOURCE_GROUP -w $WORKSPACE
+    az ml endpoint update -f endpoint.yml -n $UNIQUE_ENDPOINT_NAME `
+        --set deployments[0].model.version=$next_model_version `
+        --set deployments[0].environment.docker.image=$image_tag `
+        -g $RESOURCE_GROUP -w $WORKSPACE
 }
 
 # -- check logs in case the deployment has failed

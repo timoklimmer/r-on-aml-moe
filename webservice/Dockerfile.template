@@ -5,5 +5,5 @@ FROM rstudio/plumber
 
 # note: we need to set the path to the plumber.R file here dynamically as it depends on the model version used in AML.
 #       the walkthrough.ps1 script shows how this dynamic adjustment can be made
-# example value: "/var/azureml-app/azure ml-models/r-on-aml-moe/1/models/plumber.R"
+# example value: "/var/azureml-app/azure ml-models/r-on-aml-moe/1/webservice/plumber.R"
 CMD [#PATH_TO_PLUMBER_R#]

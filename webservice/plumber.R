@@ -1,10 +1,10 @@
-# plumber.R
+# Defines the webservice that offers our model.
 
-# -- load models (once, avoid loading models during scoring to save performance)
-accident_model <- readRDS("accident_model/model.rds")
+# -- load model(s)
+# note: intentionally loading models here to save performance later when inferencing requests are processed
+accident_model <- readRDS("model.rds")
 
 # -- define webservice functions
-
 #* Liveness check
 #* @get /live
 function() {

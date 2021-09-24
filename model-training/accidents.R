@@ -1,7 +1,7 @@
 # Trains a simple model to predict the likelihood of fatality given information about a car accident.
 
 # load data
-accidents <- readRDS(file.path("accidents.Rd"))
+accidents <- readRDS(file.path("model-training/accidents.Rd"))
 
 # check dataset
 summary(accidents)

@@ -48,6 +48,9 @@ To run the code, you need
    * Show web service URI (and password if comment in code is removed).
    * Run another test. This time against the web service in Azure.
 
+> Note: you can configure RStudio to use PowerShell in its terminal. That way, you can deploy your web service entirely
+>       from RStudio.
+
 ## Troubleshooting
 
 ### PowerShell does not run the deploy.ps1 script and writes something about an execution policy.

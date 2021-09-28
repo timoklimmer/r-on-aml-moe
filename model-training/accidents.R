@@ -1,4 +1,5 @@
-# Trains a simple model to predict the likelihood of fatality given information about a car accident.
+# Trains a simple model to predict the likelihood of fatality given information
+# about a car accident.
 
 # load data
 accidents <- readRDS(file.path("model-training/accidents.Rd"))
@@ -9,7 +10,8 @@ summary(accidents)
 # train model
 model <-
   glm(
-    dead ~ dvcat + seatbelt + frontal + sex + ageOFocc + yearVeh + airbag  + occRole,
+    dead ~ dvcat + seatbelt + frontal + sex + ageOFocc + yearVeh + airbag
+      + occRole,
     family = binomial,
     data = accidents
   )

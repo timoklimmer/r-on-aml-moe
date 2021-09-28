@@ -1,16 +1,20 @@
-# R-based inferencing webservices on Azure ML's Managed Online Endpoints
+# Deploying an R web service to Azure the easy way
 
-This is an example for deploying an R-based inferencing webservice to an Azure Machine Learning Managed Online Endpoint.
+This is an example for deploying an R-based inferencing web service to an
+[Azure Machine Learning Managed Online Endpoint](https://docs.microsoft.com/en-us/azure/machine-learning/concept-endpoints).
 It has been inspired by an example from the Azure Machine Learning team [here](https://github.com/Azure/azureml-examples/tree/main/cli/endpoints/online/custom-container/r).
 
 ## Prerequisites
 
 To run the code, you need
 - this repository cloned or downloaded to your local machine
-- optional: RStudio for editing/running R scripts
+- optional: [RStudio](https://www.rstudio.com) for editing/running R scripts
 - [PowerShell Core](https://github.com/powershell/powershell), runs on Windows, Linux and Mac
-- Docker running locally
-- an Azure Machine Learning workspace
+- Docker running locally (not required when using a
+  [Compute Instance](https://docs.microsoft.com/en-us/azure/machine-learning/concept-compute-instance) or
+  [Data Science Virtual Machine (DSVM)](https://aka.ms/dsvm) because Docker is pre-installed there already)
+- an Azure Machine Learning workspace incl. sufficient permissions
+- an [Azure CLI](https://docs.microsoft.com/en-us/cli/azure)
 - version 2 of AML's CLI extension installed, for details see
   [here](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-configure-cli).
 
@@ -22,13 +26,14 @@ To run the code, you need
    folder after training completion.
 
    > Tip: If your local machine is too slow for training the model, try the RStudio pre-installed in an [Azure Machine
-   > Learning Compute Instance](https://docs.microsoft.com/en-us/azure/machine-learning/concept-compute-instance). With
-   > the hardware power provided by a Compute Instance, you can train your models much faster. For an overview of
-   > available machine sizes in Azure, see [here](https://docs.microsoft.com/en-us/azure/virtual-machines/sizes).
+   > Learning Compute Instance](https://docs.microsoft.com/en-us/azure/machine-learning/concept-compute-instance) or a
+   > [Data Science Virtual Machine (DSVM)](https://aka.ms/dsvm). With the hardware power provided there, you can train
+   > your models much faster. For an overview of available machine sizes in Azure, see
+   > [here](https://docs.microsoft.com/en-us/azure/virtual-machines/sizes).
 
 3. Edit the `webservice/plumber.R` file to fit to your needs. If you use RStudio, you can directly test your plumber
    script from there.
-4. Edit the `sample_request.json` file and give it an example JSON document that is passed to your webservice for
+4. Edit the `sample_request.json` file and give it an example JSON document that is passed to your web service for
    testing.
 5. Modify the `Dockerfile.template` file as needed. For example, you may need to edit this file for installing
    additional R packages.
@@ -37,11 +42,11 @@ To run the code, you need
    directly in RStudio.
 8. Run the `deploy.ps1` script (from the directory where it is located). The script will then:
    * Ask you to confirm your configuration settings.
-   * Build and start a local Docker image which contains your webservice.
+   * Build and start a local Docker image which contains your web service.
    * Ask you if you want to deploy the image to an Azure Machine Learning Managed Online Endpoint.
    * If yes, deploy the model and the container.
-   * Show webservice URI (and password if comment in code is removed).
-   * Run another test. This time against the webservice in Azure.
+   * Show web service URI (and password if comment in code is removed).
+   * Run another test. This time against the web service in Azure.
 
 ## Troubleshooting
 
@@ -61,3 +66,6 @@ For details on Azure Machine Learning, see the documentation
 
 ## Disclaimer
 As always, everything provided here is provided "as is". Feel free to use but don't blame me if things go wrong.
+
+I am open for pull requests. Please submit a pull request before starting your own public fork so we can keep things
+together.

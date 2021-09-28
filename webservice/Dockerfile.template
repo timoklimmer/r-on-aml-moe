@@ -1,6 +1,10 @@
 FROM rstudio/plumber
 
 # install R packages (adjust this as needed)
+# note: in case you are behind a proxy, you may need to tell R about your proxy so you can reach required URLs.
+#       you can do so by adding a "Sys.setenv('HTTP_PROXY' = '...', 'HTTPS_PROXY' = '...');" in your R scripts below.
+#       the settings are set only during the session, so the final container will not use the proxies anymore (as
+#       intended).
 # RUN Rscript -e "install.packages(c('devtools', 'jsonlite', 'data.table'))"
 
 # note: we need to set the path to the plumber.R file here dynamically as it depends on the model version used in AML.

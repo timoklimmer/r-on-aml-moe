@@ -150,8 +150,14 @@ $primary_key = $(az ml endpoint get-credentials -n $($config.UNIQUE_ENDPOINT_NAM
 
 # -- test endpoint in Azure
 Write-Host "`n>> Test webservice in Azure..." -ForegroundColor DarkCyan
+if ([string]::IsNullOrWhiteSpace($config.HTTPS_PROXY)) {
 curl -H "Content-Type: application/json" -H "Authorization: Bearer $primary_key" `
     --data "@webservice/sample_request.json" $scoring_uri
+} else {
+curl -H "Content-Type: application/json" -H "Authorization: Bearer $primary_key" `
+    --data "@webservice/sample_request.json" $scoring_uri `
+    --proxy "$($config.HTTPS_PROXY)"
+}
 Write-Host
 
 # -- done

@@ -6,6 +6,14 @@
 # - a local Docker instance (for dev/test before deploying to Azure)
 # - a proper configuration, see webservice/config.psd1 file
 
+Param(
+    [Parameter(Mandatory = $False)]
+    [switch]$AcceptConfiguration = $False,
+
+    [Parameter(Mandatory = $False)]
+    [switch]$DeployToAzure = $False
+)
+
 $ErrorActionPreference = "Stop"
 
 # -- load configuration
@@ -19,7 +27,7 @@ if (![string]::IsNullOrWhiteSpace($config.HTTPS_PROXY)) {
 }
 $config.GetEnumerator() | Sort-Object -Property key
 Write-Host
-if (!((Read-Host -Prompt "Do you want to continue with the configuration shown above? [y/n]") -match "[yY]")) { 
+if (!$AcceptConfiguration || (!((Read-Host -Prompt "Do you want to continue with the configuration shown above? [y/n]") -match "[yY]"))) { 
     exit 1
 }
 Write-Host
@@ -79,7 +87,7 @@ curl -H "Content-Type: application/json" --data "@webservice/sample_request.json
 Write-Host "`n"
 
 ## DEPLOY TO AZURE
-if (!((Read-Host -Prompt "Do you want to continue and deploy your container to Azure? [y/n]") -match "[yY]")) { 
+if (!$DeployToAzure || (!((Read-Host -Prompt "Do you want to continue and deploy your container to Azure? [y/n]") -match "[yY]"))) { 
     exit 1
 }
 Write-Host "`nDeploy to Azure..." -ForegroundColor Cyan
@@ -142,21 +150,22 @@ else {
 # -- get URI and credentials for endpoint
 Write-Host "`n>> Getting scoring URI and authentication keys for webservice..." -ForegroundColor DarkCyan
 $scoring_uri = $(az ml endpoint show -n $($config.UNIQUE_ENDPOINT_NAME) -g $($config.RESOURCE_GROUP) `
-    -w $($config.WORKSPACE) --query "scoring_uri" -o tsv)
+        -w $($config.WORKSPACE) --query "scoring_uri" -o tsv)
 Write-Host "Scoring URI: $scoring_uri"
 $primary_key = $(az ml endpoint get-credentials -n $($config.UNIQUE_ENDPOINT_NAME) -g $($config.RESOURCE_GROUP) `
-    -w $($config.WORKSPACE) --query "primaryKey" -o tsv)
+        -w $($config.WORKSPACE) --query "primaryKey" -o tsv)
 #Write-Host "Primary Key: $primary_key"
 
 # -- test endpoint in Azure
 Write-Host "`n>> Test webservice in Azure..." -ForegroundColor DarkCyan
 if ([string]::IsNullOrWhiteSpace($config.HTTPS_PROXY)) {
-curl -H "Content-Type: application/json" -H "Authorization: Bearer $primary_key" `
-    --data "@webservice/sample_request.json" $scoring_uri
-} else {
-curl -H "Content-Type: application/json" -H "Authorization: Bearer $primary_key" `
-    --data "@webservice/sample_request.json" $scoring_uri `
-    --proxy "$($config.HTTPS_PROXY)"
+    curl -H "Content-Type: application/json" -H "Authorization: Bearer $primary_key" `
+        --data "@webservice/sample_request.json" $scoring_uri
+}
+else {
+    curl -H "Content-Type: application/json" -H "Authorization: Bearer $primary_key" `
+        --data "@webservice/sample_request.json" $scoring_uri `
+        --proxy "$($config.HTTPS_PROXY)"
 }
 Write-Host
 

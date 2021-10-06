@@ -49,6 +49,7 @@ To run the code, you need
    * If yes, deploy the model and the container.
    * Show web service URI (and password if comment in code is removed).
    * Run another test. This time against the web service in Azure.
+   * By passing a `-AcceptConfiguration` and/or `-DeployToAzure` switch, you can bypass the user confirmations.
 
 > Note: you can configure RStudio to use PowerShell in its terminal. That way, you can deploy your web service entirely
 >       from RStudio.

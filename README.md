@@ -13,8 +13,8 @@ To run the code, you need
 - optional: [RStudio](https://www.rstudio.com) for editing/running R scripts
 - [PowerShell Core](https://github.com/powershell/powershell), runs on Windows, Linux and Mac
 - Docker running locally (not required when using a
-  [Compute Instance](https://docs.microsoft.com/en-us/azure/machine-learning/concept-compute-instance) or
-  [Data Science Virtual Machine (DSVM)](https://aka.ms/dsvm) because Docker is pre-installed there already)
+  [Compute Instance](https://docs.microsoft.com/en-us/azure/machine-learning/concept-compute-instance) or an
+  [Ubuntu Data Science Virtual Machine (DSVM)](https://aka.ms/dsvm) where Linux Docker is pre-installed already)
 - an Azure Machine Learning workspace incl. sufficient permissions
 - an [Azure CLI](https://docs.microsoft.com/en-us/cli/azure)
 - version 2 of AML's CLI extension installed, for details see

@@ -171,15 +171,3 @@ Write-Host
 
 # -- done
 Write-Host "`nDone."
-
-
-## CLEANUP
-
-# -- delete endpoint and model in Azure
-# az ml endpoint delete --name $($config.UNIQUE_ENDPOINT_NAME) -g $($config.RESOURCE_GROUP) -w $($config.WORKSPACE)
-# az ml model delete --name $($config.MODEL_NAME) --version $next_model_version -g $($config.RESOURCE_GROUP) -w $($config.WORKSPACE)
-# TODO: delete image from ACR
-
-# -- remove artifacts from local docker
-# docker rm -f -v $($config.APP_NAME)
-# docker image rm -f $($config.APP_NAME)

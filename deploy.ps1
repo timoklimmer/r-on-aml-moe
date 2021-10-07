@@ -27,7 +27,7 @@ if (![string]::IsNullOrWhiteSpace($config.HTTPS_PROXY)) {
 }
 $config.GetEnumerator() | Sort-Object -Property key
 Write-Host
-if (!$AcceptConfiguration || (!((Read-Host -Prompt "Do you want to continue with the configuration shown above? [y/n]") -match "[yY]"))) { 
+if (!$AcceptConfiguration -and (!((Read-Host -Prompt "Do you want to continue with the configuration shown above? [y/n]") -match "[yY]"))) { 
     exit 1
 }
 Write-Host
@@ -87,7 +87,7 @@ curl -H "Content-Type: application/json" --data "@webservice/sample_request.json
 Write-Host "`n"
 
 ## DEPLOY TO AZURE
-if (!$DeployToAzure || (!((Read-Host -Prompt "Do you want to continue and deploy your container to Azure? [y/n]") -match "[yY]"))) { 
+if (!$DeployToAzure -and (!((Read-Host -Prompt "Do you want to continue and deploy your container to Azure? [y/n]") -match "[yY]"))) { 
     exit 1
 }
 Write-Host "`nDeploy to Azure..." -ForegroundColor Cyan

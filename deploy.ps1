@@ -145,9 +145,9 @@ az ml online-deployment create -f webservice/deployment.yml `
     --set app_insights_enabled=$($config.APP_INSIGHTS_ENABLED.ToString().ToLower())
 
 # -- check logs, esp. for the case that the deployment has failed
-Write-Host "`n>> Getting deployment logs..." -ForegroundColor DarkCyan
-az ml online-deployment get-logs --name $($config.UNIQUE_ENDPOINT_NAME) `
-    --endpoint-name default --lines 100 --resource-group $($config.RESOURCE_GROUP) --workspace-name $($config.WORKSPACE)
+#Write-Host "`n>> Getting deployment logs..." -ForegroundColor DarkCyan
+#az ml online-deployment get-logs --name $($config.UNIQUE_ENDPOINT_NAME) `
+#    --endpoint-name default --lines 100 --resource-group $($config.RESOURCE_GROUP) --workspace-name $($config.WORKSPACE)
 
 # -- get URI and credentials for endpoint
 Write-Host "`n>> Getting scoring URI and authentication keys for webservice..." -ForegroundColor DarkCyan

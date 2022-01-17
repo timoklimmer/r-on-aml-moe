@@ -1,13 +1,14 @@
 # Deploying an R web service to Azure the easy way
 
-> Note: There was a refresh of the Managed Online Endpoint preview feature, and the contained code needs to be updated.
->       It will be updated soon.
-
 This is an example for deploying an R-based inferencing web service to an
 [Azure Machine Learning Managed Online Endpoint](https://docs.microsoft.com/en-us/azure/machine-learning/concept-endpoints).
 It has been inspired by an example from the Azure Machine Learning team [here](https://github.com/Azure/azureml-examples/tree/main/cli/endpoints/online/custom-container/r). You can use this repo to directly deploy to Azure from RStudio.
 
 In case you are interested, I have written a companion article on Medium [here](https://medium.com/@timo.klimmer/azure-mls-managed-online-endpoints-rock-cbd021c80263).
+
+## Known Issue(s)
+- You might run into deployment issues when updating an existing deployment. This is currently under review. In the
+  meantime, you might need to delete the previously deployed endpoint before re-deploying.
 
 ## Prerequisites
 

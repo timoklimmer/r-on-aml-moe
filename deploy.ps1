@@ -27,7 +27,8 @@ if (![string]::IsNullOrWhiteSpace($config.HTTPS_PROXY)) {
 }
 $config.GetEnumerator() | Sort-Object -Property key
 Write-Host
-if (!$AcceptConfiguration -and (!((Read-Host -Prompt "Do you want to continue with the configuration shown above? [y/n]") -match "[yY]"))) { 
+if (!$AcceptConfiguration -and `
+        (!((Read-Host -Prompt "Do you want to continue with the configuration shown above? [y/n]") -match "[yY]"))) { 
     exit 1
 }
 Write-Host
@@ -35,17 +36,28 @@ Write-Host
 # -- compute several required variable values
 Write-Host ">> Computing several required variable values..." -ForegroundColor DarkCyan
 $local_model_path = "$PWD/webservice"
-$acr_name = $(az ml workspace show -g $($config.RESOURCE_GROUP) -w $($config.WORKSPACE) `
+$acr_name = $(az ml workspace show -g $($config.RESOURCE_GROUP) -n $($config.WORKSPACE) `
         --query container_registry -o tsv).split("/")[-1]
 $image_tag = "$acr_name.azurecr.io/$($config.APP_NAME)" + ":latest"
 $latest_model_version = 0
 try {
-    $latest_model_version = $(az ml model show -n $($config.MODEL_NAME) -g $($config.RESOURCE_GROUP) `
-            -w $($config.WORKSPACE) --query version)
+    $latest_model_version = $(az ml model list -n $($config.MODEL_NAME) `
+        -g $($config.RESOURCE_GROUP) -w $($config.WORKSPACE) --query 'reverse(sort_by([], &version))[0].version' -o tsv)
 }
 finally {
     $next_model_version = [int] $latest_model_version + 1
+    Write-Host "Next model version: $next_model_version"
 }
+try {
+    $latest_environment_version = $(az ml environment list -n $($config.MODEL_NAME) `
+        -g $($config.RESOURCE_GROUP) -w $($config.WORKSPACE) --query 'reverse(sort_by([], &version))[0].version' -o tsv)
+}
+finally {
+    $next_environment_version = [int] $latest_environment_version + 1
+    Write-Host "Next environment version: $next_environment_version"
+}
+
+
 
 ## LOCAL CONTAINER BUILD FOR TESTING
 Write-Host "`nBuild and run local container..." -ForegroundColor Cyan
@@ -87,7 +99,8 @@ curl -H "Content-Type: application/json" --data "@webservice/sample_request.json
 Write-Host "`n"
 
 ## DEPLOY TO AZURE
-if (!$DeployToAzure -and (!((Read-Host -Prompt "Do you want to continue and deploy your container to Azure? [y/n]") -match "[yY]"))) { 
+if (!$DeployToAzure -and `
+        (!((Read-Host -Prompt "Do you want to continue and deploy your container to Azure? [y/n]") -match "[yY]"))) { 
     exit 1
 }
 Write-Host "`nDeploy to Azure..." -ForegroundColor Cyan
@@ -107,52 +120,41 @@ Write-Host "`n>> Pushing container image to Azure Container Registry..." -Foregr
 az acr login --name $acr_name
 docker push $image_tag
 
-# -- deploy endpoint to AML managed online endpoint
-Write-Host "`n>> Creating/updating AML Managed Online Endpoint..." -ForegroundColor DarkCyan
-$endpoint_exists = [System.Convert]::ToBoolean(
-    $(az ml endpoint show -n $($config.UNIQUE_ENDPOINT_NAME) --query name -o tsv -g $($config.RESOURCE_GROUP) `
-            -w $($config.WORKSPACE)) -eq $($config.UNIQUE_ENDPOINT_NAME)
-)
-if ($endpoint_exists -eq $false) {
-    az ml endpoint create -f webservice/managedOnlineEndpoint.yml `
-        -g $($config.RESOURCE_GROUP) -w $($config.WORKSPACE) `
+# -- deploy endpoint and deployment to AML managed online endpoint
+Write-Host "`n>> Creating/updating AML Managed Online Endpoint and deployment..." -ForegroundColor DarkCyan
+# endpoint
+Write-Host "Endpoint..."
+az ml online-endpoint create -f webservice/endpoint.yml `
+    -g $($config.RESOURCE_GROUP) -w $($config.WORKSPACE) `
         -n $($config.UNIQUE_ENDPOINT_NAME) `
-        --set name=$($config.APP_NAME) `
-        --set deployments[0].model.name=$($config.MODEL_NAME) `
-        --set deployments[0].model.version=$next_model_version `
-        --set deployments[0].environment.name=$($config.APP_NAME) `
-        --set deployments[0].environment.docker.image=$image_tag `
-        --set deployments[0].environment.docker.image=$image_tag `
-        --set deployments[0].instance_type=$($config.INSTANCE_TYPE) `
-        --set deployments[0].scale_settings.instance_count=$($config.INSTANCE_COUNT) `
-        --set deployments[0].scale_settings.min_instances=$($config.INSTANCE_COUNT) `
-        --set deployments[0].scale_settings.max_instances=$($config.INSTANCE_COUNT)
-}
-else {
-    az ml endpoint update -f webservice/managedOnlineEndpoint.yml `
-        -g $($config.RESOURCE_GROUP) -w $($config.WORKSPACE) `
-        -n $($config.UNIQUE_ENDPOINT_NAME) `
-        --set name=$($config.APP_NAME) `
-        --set deployments[0].model.name=$($config.MODEL_NAME) `
-        --set deployments[0].model.version=$next_model_version `
-        --set deployments[0].environment.name=$($config.APP_NAME) `
-        --set deployments[0].environment.docker.image=$image_tag `
-        --set deployments[0].environment.docker.image=$image_tag `
-        --set deployments[0].instance_type=$($config.INSTANCE_TYPE) `
-        --set deployments[0].scale_settings.instance_count=$($config.INSTANCE_COUNT) `
-        --set deployments[0].scale_settings.min_instances=$($config.INSTANCE_COUNT) `
-        --set deployments[0].scale_settings.max_instances=$($config.INSTANCE_COUNT)
-}
+        --set name=$($config.APP_NAME)
+# deployment
+Write-Host "Deployment..."
+az ml online-deployment create -f webservice/deployment.yml `
+    -g $($config.RESOURCE_GROUP) -w $($config.WORKSPACE) `
+    -n $($config.UNIQUE_ENDPOINT_NAME) `
+    --all-traffic `
+    --set endpoint_name=$($config.UNIQUE_ENDPOINT_NAME) `
+    --set model.name=$($config.MODEL_NAME) `
+    --set model.version=$next_model_version `
+    --set environment.name=$($config.APP_NAME) `
+    --set environment.version=$next_environment_version `
+    --set environment.image=$image_tag `
+    --set instance_type=$($config.INSTANCE_TYPE) `
+    --set instance_count=$($config.INSTANCE_COUNT) `
+    --set app_insights_enabled=$($config.APP_INSIGHTS_ENABLED.ToString().ToLower())
 
-# -- check logs in case the deployment has failed
-# az ml endpoint get-logs --name $($config.UNIQUE_ENDPOINT_NAME) --deployment default --lines 100 --resource-group $($config.RESOURCE_GROUP) --workspace-name $($config.WORKSPACE)
+# -- check logs, esp. for the case that the deployment has failed
+Write-Host "`n>> Getting deployment logs..." -ForegroundColor DarkCyan
+az ml online-deployment get-logs --name $($config.UNIQUE_ENDPOINT_NAME) `
+    --endpoint-name default --lines 100 --resource-group $($config.RESOURCE_GROUP) --workspace-name $($config.WORKSPACE)
 
 # -- get URI and credentials for endpoint
 Write-Host "`n>> Getting scoring URI and authentication keys for webservice..." -ForegroundColor DarkCyan
-$scoring_uri = $(az ml endpoint show -n $($config.UNIQUE_ENDPOINT_NAME) -g $($config.RESOURCE_GROUP) `
+$scoring_uri = $(az ml online-endpoint show -n $($config.UNIQUE_ENDPOINT_NAME) -g $($config.RESOURCE_GROUP) `
         -w $($config.WORKSPACE) --query "scoring_uri" -o tsv)
 Write-Host "Scoring URI: $scoring_uri"
-$primary_key = $(az ml endpoint get-credentials -n $($config.UNIQUE_ENDPOINT_NAME) -g $($config.RESOURCE_GROUP) `
+$primary_key = $(az ml online-endpoint get-credentials -n $($config.UNIQUE_ENDPOINT_NAME) -g $($config.RESOURCE_GROUP) `
         -w $($config.WORKSPACE) --query "primaryKey" -o tsv)
 #Write-Host "Primary Key: $primary_key"
 

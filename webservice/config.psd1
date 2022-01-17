@@ -31,9 +31,10 @@ Notes: - If you need additional packages or other adjustments of the container i
     INSTANCE_TYPE = "Standard_F2s_v2"
 
     # number of virtual machines serving the requests against the webservice
-    # note: at the time of writing this file, there was no autoscaling support yet. if you need it, please check if it
-    #       is available meanwhile.
     INSTANCE_COUNT = 1
+
+    # whether to enable app insights or not
+    APP_INSIGHTS_ENABLED = $True
 
     # proxy addresses
     # note: Docker needs to be configured separately for proxy usage

@@ -1,0 +1,24 @@
+$schema: https://azuremlschemas.azureedge.net/latest/managedOnlineDeployment.schema.json
+name: default
+endpoint_name: dummy # will be overwritten from outside, eg. r-on-aml-moe
+model:
+  name: dummy # will be overwritten from outside, eg. r-on-aml-moe
+  version: 1 # will be overwritten from outside, eg. 1
+  local_path: .
+environment:
+  name: dummy # will be overwritten from outside, eg. r-on-aml-moe
+  version: 1
+  image: dummy # will be overwritten from outside, eg. myacr.azurecr.io/mycontainer:latest
+  inference_config:
+    liveness_route:
+      port: 8000
+      path: /live
+    readiness_route:
+      port: 8000
+      path: /ready
+    scoring_route:
+      port: 8000
+      path: /score
+instance_type: Standard_F2s_v2  # will be overwritten from outside, eg. Standard_F2s_v2
+instance_count: 1  # will be overwritten from outside, eg. 1
+app_insights_enabled: false # will be overwritten from outside, eg. true

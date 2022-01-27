@@ -6,10 +6,6 @@ It has been inspired by an example from the Azure Machine Learning team [here](h
 
 In case you are interested, I have written a companion article on Medium [here](https://medium.com/@timo.klimmer/azure-mls-managed-online-endpoints-rock-cbd021c80263).
 
-## Known Issue(s)
-- You might run into deployment issues when updating an existing deployment. This is currently under review. In the
-  meantime, you might need to delete the previously deployed endpoint, environment and model before re-deploying.
-
 ## Prerequisites
 
 To run the code, you need
@@ -57,6 +53,10 @@ To run the code, you need
 
 > Note: you can configure RStudio to use PowerShell in its terminal. That way, you can deploy your web service entirely
 >       from RStudio.
+
+## Known Issues
+The code provided here does not yet support AML MOE's autoscaling features. To get autoscaling, you need to extend the
+code or configure the autoscaling feature in AML manually.
 
 ## Troubleshooting
 

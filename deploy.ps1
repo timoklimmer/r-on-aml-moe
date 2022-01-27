@@ -38,7 +38,6 @@ Write-Host ">> Computing several required variable values..." -ForegroundColor D
 $local_model_path = "$PWD/webservice"
 $acr_name = $(az ml workspace show -g $($config.RESOURCE_GROUP) -n $($config.WORKSPACE) `
         --query container_registry -o tsv).split("/")[-1]
-$image_tag = "$acr_name.azurecr.io/$($config.APP_NAME)" + ":latest"
 $latest_model_version = 0
 try {
     $latest_model_version = $(az ml model list -n $($config.MODEL_NAME) `
@@ -56,7 +55,7 @@ finally {
     $next_environment_version = [int] $latest_environment_version + 1
     Write-Host "Next environment version: $next_environment_version"
 }
-
+$image_tag = "$acr_name.azurecr.io/$($config.APP_NAME):$latest_model_version"
 
 
 ## LOCAL CONTAINER BUILD FOR TESTING

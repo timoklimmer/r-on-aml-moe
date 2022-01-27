@@ -8,7 +8,7 @@ In case you are interested, I have written a companion article on Medium [here](
 
 ## Known Issue(s)
 - You might run into deployment issues when updating an existing deployment. This is currently under review. In the
-  meantime, you might need to delete the previously deployed endpoint before re-deploying.
+  meantime, you might need to delete the previously deployed endpoint, environment and model before re-deploying.
 
 ## Prerequisites
 
